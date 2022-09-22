@@ -1,0 +1,126 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558 
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+
+//Build tasks for makefile:
+        {
+            "label": "Makefile",
+            "type": "shell",
+            "group": "build",
+            "command": "make",
+            "args": ["XLEN=64", "DEBUG=1"],
+            "problemMatcher": [
+                "$gcc"
+            ],
+        },
+        {
+            "label": "Makefile clean",
+            "type": "shell",
+            "group": "build",
+            "command": "make",
+            "args": ["clean"],
+        },
+
+//Launch with hardware:
+        {
+            "label": "startOpenocdHW",
+            "type": "shell",
+            "isBackground": true,
+            "command": "/home/user/toolchain/riscv-openocd-0.10.0-2020.12.1-x86_64-linux-ubuntu14/bin/openocd",
+            "args": ["-f", "${workspaceFolder}/cfg/riscpoa.cfg"],
+        },
+
+//Launch with Spike simulator:
+        {
+            "label": "_startSpike",
+            "type": "shell",
+            "isBackground": true,
+            "options": {
+                "env": {
+                    "LD_LIBRARY_PATH": "/home/user/toolchain/riscv_tui_12.12.18/lib/"
+                }
+            },
+            "command": "/home/user/toolchain/riscv_tui_12.12.18/bin/spike",
+            "args": ["--rbb-port=9824", "-m0x10000000:0x10000000", "-H", "${workspaceFolder}/build/RTOSDemo64.elf"],
+            "problemMatcher": {
+                "pattern":[
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3,
+                    }
+                ],
+                "background": {
+                    "activeOnStart": false,
+                    "beginsPattern": ".",
+                    "endsPattern": ".",
+                },
+            },
+        },
+        {
+            "label": "_startOpenocdSpike",
+            "type": "shell",
+            "isBackground": true,
+            "command": "/home/user/toolchain/riscv-openocd-0.10.0-2020.12.1-x86_64-linux-ubuntu14/bin/openocd",
+            "args": ["-f", "${workspaceFolder}/cfg/spike-1.cfg"],
+            "problemMatcher": {
+                "pattern":[
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3,
+                    }
+                ],
+                "background": {
+                    "activeOnStart": false,
+                    "beginsPattern": ".",
+                    "endsPattern": ".",
+                },
+            },
+        },
+        {
+            "label": "startOpenocdSpike",
+            "type": "shell",
+            "isBackground": true,
+            "command": "echo Start Spike and OpenOCD",
+            "dependsOn": ["_startSpike", "_startOpenocdSpike"],
+            "dependsOrder": "sequence",
+            "problemMatcher": {
+                "pattern":[
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3,
+                    }
+                ],
+                "background": {
+                    "activeOnStart": false,
+                    "beginsPattern": ".",
+                    "endsPattern": ".",
+                },
+            },
+        },
+
+//Stop all task-process after debug session (after GDB stopped):
+//Using task + "inputs"
+        {
+            "label": "Termitate all tasks",
+            "type": "shell",
+            "command": "echo ${input:terminate}",
+        }
+    ],
+
+    "inputs": [
+        {
+            "id": "terminate",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "terminateAll"
+        }
+    ]
+}

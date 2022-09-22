@@ -1,0 +1,28 @@
+
+#--------------------------------
+#For launch:
+
+OPENOCD="/home/user/toolchain/riscv-openocd-0.10.0-2020.12.1-x86_64-linux-ubuntu14/bin/openocd"
+OPENOCD_CFG_HW="./cfg/riscpoa.cfg"
+
+GDB="/home/user/toolchain/gdb_overlay/riscv64-unknown-elf-gdb-10.1.0-2020.12.8-x86_64-linux-ubuntu14/bin/riscv64-unknown-elf-gdb-py"
+
+#--------------------------------
+#For Spike:
+SPIKE="/home/user/toolchain/riscv_tui_12.12.18/bin/spike"
+LD_LIB_PATH="/home/user/toolchain/riscv_tui_12.12.18/lib/"
+OPENOCD_CFG_SPIKE="./cfg/spike-1.cfg"
+
+#--------------------------------
+#Launch configurations:
+#   "/gdb_launch.gdb" => Launch execution
+
+GDB_SCRIPT="./gdb_launch.gdb"
+
+#--------------------------------
+#For build:
+
+TOOLS=/home/user/toolchain/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/bin/
+RISCV_LD_LIBRARY_PATH=/home/user/toolchain/riscv64-unknown-elf-toolchain-10.2.0-2020.12.8-x86_64-linux-ubuntu14/riscv64-unknown-elf/lib/rv64imfdc/lp64d/
+
+#--------------------------------
