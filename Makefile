@@ -29,14 +29,10 @@ endif
 
 BUILD_DIR       = build
 RTOS_SOURCE_DIR = ./FreeRTOS/Source
-DEMO_SOURCE_DIR = ./FreeRTOS/Demo/Common/Minimal
-#RTOS_SOURCE_DIR = $(abspath ./FreeRTOS/Source)
-#DEMO_SOURCE_DIR = $(abspath ./FreeRTOS/Demo/Common/Minimal)
 
 CPPFLAGS = \
 	-DportasmHANDLE_INTERRUPT=handle_trap \
 	-I ./src \
-	-I ./FreeRTOS/Demo/Common/include \
 	-I $(RTOS_SOURCE_DIR)/include \
 	-I $(RTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I $(RTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions
@@ -60,12 +56,6 @@ else
 endif
 
 SRCS = ./src/main.c ./src/main_blinky.c ./src/riscv-virt.c ./src/htif.c \
-	$(DEMO_SOURCE_DIR)/EventGroupsDemo.c \
-	$(DEMO_SOURCE_DIR)/TaskNotify.c \
-	$(DEMO_SOURCE_DIR)/TimerDemo.c \
-	$(DEMO_SOURCE_DIR)/blocktim.c \
-	$(DEMO_SOURCE_DIR)/dynamic.c \
-	$(DEMO_SOURCE_DIR)/recmutex.c \
 	$(RTOS_SOURCE_DIR)/event_groups.c \
 	$(RTOS_SOURCE_DIR)/list.c \
 	$(RTOS_SOURCE_DIR)/queue.c \
