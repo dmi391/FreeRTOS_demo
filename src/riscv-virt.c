@@ -27,22 +27,52 @@
 #include <FreeRTOS.h>
 
 #include <string.h>
+#include <stdio.h>
 
 #include "riscv-virt.h"
 #include "htif.h"
 
-int xGetCoreID( void )
+extern char _LOG_START_ADDRESS;
+char* currLogAddr = &_LOG_START_ADDRESS;
+extern char _LOG_END_ADDRESS;
+char* endLogAddr = &_LOG_END_ADDRESS;
+static const char endOfLogMem[] = "\nMemory log is over\n";
+static int logIsOver = 0;
+
+/*
+* Return csr mcycle
+*/
+unsigned long xGetMcycle( void )
 {
-	int id;
+	unsigned long cycle;
 
-	__asm ("csrr %0, mhartid" : "=r" ( id ) );
-
-	return id;
+	asm volatile ("csrr %[out], mcycle" :[out] "=r"(cycle)::);
+	return cycle;
 }
 
-/* Use a debugger to set this to 0 if this binary was loaded through gdb instead
- * of spike's ELF loader. HTIF only works if spike's ELF loader was used. */
-volatile int use_htif = 1;
+/*
+* Write string to memory log
+*/
+void vLogWrite( char* str )
+{
+	if(!logIsOver)
+	{
+		size_t freeSpace = endLogAddr - currLogAddr;
+		if(freeSpace > sizeof(endOfLogMem) + 20)
+		{
+			currLogAddr += sprintf(currLogAddr, str);
+			currLogAddr += sprintf(currLogAddr, "\n");
+		}
+		else
+		{
+			currLogAddr += sprintf(currLogAddr, endOfLogMem);
+			logIsOver = 1;
+		}
+	}
+}
+
+//Set use_htif = 1 with debugger for output to Spike terminal
+volatile int use_htif = 0;
 
 void vSendString( const char *s )
 {

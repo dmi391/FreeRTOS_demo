@@ -115,4 +115,7 @@ SECTIONS
 		. += __stack_size;
 		_stack_top = .;
 	} >ram AT>ram
+
+	_LOG_START_ADDRESS = _stack_top + 0x10;
+	_LOG_END_ADDRESS = _LOG_START_ADDRESS + 0x10000;
 }

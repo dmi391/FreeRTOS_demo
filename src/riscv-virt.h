@@ -44,7 +44,8 @@
 
 #ifndef __ASSEMBLER__
 
-int xGetCoreID( void );
+unsigned long xGetMcycle( void );
+void vLogWrite( char* str );
 void vSendString( const char * s );
 
 #endif /* __ASSEMBLER__ */

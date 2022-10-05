@@ -39,7 +39,7 @@
 
 /* The rate at which data is sent to the queue.  The 200ms value is converted
 to ticks using the pdMS_TO_TICKS() macro. */
-#define mainQUEUE_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 1000 )
+#define mainQUEUE_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 10 )
 
 /* The maximum number items the queue can hold.  The priority of the receiving
 task is above the priority of the sending task, so the receiving task will
@@ -75,10 +75,13 @@ static void prvQueueSendTask( void *pvParameters )
 		ulValueToSend++;
 
 		char buf[40];
-		sprintf( buf, "%d: %s: send %ld", xGetCoreID(),
+		sprintf( buf, "%lu: %s: send %ld", xGetMcycle(),
 				pcTaskGetName( xTaskGetCurrentTaskHandle() ),
-				ulValueToSend );
-		vSendString( buf );
+				ulValueToSend );	//Form string to buf
+
+		vSendString( buf );			//Output to Spike terminal
+
+		vLogWrite( buf );			//Output to memory log
 
 		/* 0 is used as the block time so the sending operation will not block -
 		 * it shouldn't need to block as the queue should always be empty at
@@ -105,10 +108,13 @@ static void prvQueueReceiveTask( void *pvParameters )
 
 		/*  To get here something must have been received from the queue. */
 		char buf[40];
-		sprintf( buf, "%d: %s: received %ld", xGetCoreID(),
+		sprintf( buf, "%lu: %s: received %ld", xGetMcycle(),
 				pcTaskGetName( xTaskGetCurrentTaskHandle() ),
-				ulReceivedValue );
-		vSendString( buf );
+				ulReceivedValue );	//Form string to buf
+		
+		vSendString( buf );			//Output to Spike terminal
+
+		vLogWrite( buf );			//Output to memory log
 	}
 }
 
@@ -116,7 +122,8 @@ static void prvQueueReceiveTask( void *pvParameters )
 
 int main_blinky( void )
 {
-	vSendString( "Hello FreeRTOS!" );
+	vSendString( "Spike: Hello, FreeRTOS!" );	//Output to Spike terminal
+	vLogWrite( "Hello, FreeRTOS!\n" );			//Output to memory log
 
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
