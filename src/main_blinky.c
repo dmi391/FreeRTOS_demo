@@ -28,6 +28,7 @@
 #include <FreeRTOS.h>
 #include <task.h>
 #include <queue.h>
+#include "semphr.h"
 
 #include <stdio.h>
 
@@ -53,6 +54,9 @@ find the queue full. */
 
 /* The queue used by both tasks. */
 static QueueHandle_t xQueue = NULL;
+
+/* Mutex to protect 'currLogAddr' and 'logIsOver' in both tasks.*/
+SemaphoreHandle_t xMutex;
 
 /*-----------------------------------------------------------*/
 
@@ -81,7 +85,11 @@ static void prvQueueSendTask( void *pvParameters )
 
 		vSendString( buf );			//Output to Spike terminal
 
-		vLogWrite( buf );			//Output to memory log
+		xSemaphoreTake( xMutex, portMAX_DELAY );
+		{
+			vLogWrite( buf );		//Output to memory log
+		}
+		xSemaphoreGive( xMutex );
 
 		/* 0 is used as the block time so the sending operation will not block -
 		 * it shouldn't need to block as the queue should always be empty at
@@ -114,7 +122,11 @@ static void prvQueueReceiveTask( void *pvParameters )
 		
 		vSendString( buf );			//Output to Spike terminal
 
-		vLogWrite( buf );			//Output to memory log
+		xSemaphoreTake( xMutex, portMAX_DELAY );
+		{
+			vLogWrite( buf );		//Output to memory log
+		}
+		xSemaphoreGive( xMutex );
 	}
 }
 
@@ -128,7 +140,10 @@ int main_blinky( void )
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
 
-	if( xQueue != NULL )
+	/* Create mutex. */
+	xMutex = xSemaphoreCreateMutex();
+
+	if( (xQueue != NULL) && (xMutex != NULL) )
 	{
 		/* Start the two tasks as described in the comments at the top of this
 		file. */

@@ -34,9 +34,12 @@
 
 extern char _LOG_START_ADDRESS;
 char* currLogAddr = &_LOG_START_ADDRESS;
+
 extern char _LOG_END_ADDRESS;
-char* endLogAddr = &_LOG_END_ADDRESS;
+char* const endLogAddr = &_LOG_END_ADDRESS;
+
 static const char endOfLogMem[] = "\nMemory log is over\n";
+
 static int logIsOver = 0;
 
 /*
