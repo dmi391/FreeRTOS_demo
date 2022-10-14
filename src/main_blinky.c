@@ -40,7 +40,7 @@
 
 /* The rate at which data is sent to the queue.  The 200ms value is converted
 to ticks using the pdMS_TO_TICKS() macro. */
-#define mainQUEUE_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 10 )
+#define mainQUEUE_SEND_FREQUENCY_MS			pdMS_TO_TICKS( 100 )
 
 /* The maximum number items the queue can hold.  The priority of the receiving
 task is above the priority of the sending task, so the receiving task will
@@ -83,10 +83,10 @@ static void prvQueueSendTask( void *pvParameters )
 				pcTaskGetName( xTaskGetCurrentTaskHandle() ),
 				ulValueToSend );	//Form string to buf
 
-		vSendString( buf );			//Output to Spike terminal
-
 		xSemaphoreTake( xMutex, portMAX_DELAY );
 		{
+			vSendString( buf );		//Output to Spike terminal
+
 			vLogWrite( buf );		//Output to memory log
 		}
 		xSemaphoreGive( xMutex );
@@ -119,11 +119,11 @@ static void prvQueueReceiveTask( void *pvParameters )
 		sprintf( buf, "%lu: %s: received %ld", xGetMcycle(),
 				pcTaskGetName( xTaskGetCurrentTaskHandle() ),
 				ulReceivedValue );	//Form string to buf
-		
-		vSendString( buf );			//Output to Spike terminal
 
 		xSemaphoreTake( xMutex, portMAX_DELAY );
 		{
+			vSendString( buf );		//Output to Spike terminal
+
 			vLogWrite( buf );		//Output to memory log
 		}
 		xSemaphoreGive( xMutex );
