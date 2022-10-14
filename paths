@@ -15,9 +15,12 @@ OPENOCD_CFG_SPIKE="./cfg/spike-1.cfg"
 
 #--------------------------------
 #Launch configurations:
-#   "/gdb_launch.gdb" => Launch execution
+#   "/gdb_launch_hw.gdb" => Launch execution with hardware
+#   "/gdb_launch_spike.gdb" => Launch execution with Spike
 
-GDB_SCRIPT="./gdb_launch.gdb"
+GDB_SCRIPT_HW="./launch-sh/gdb_launch_hw.gdb"
+
+GDB_SCRIPT_SPIKE="./launch-sh/gdb_launch_spike.gdb"
 
 #--------------------------------
 #For build:

@@ -8,16 +8,8 @@ load
 #set debug remote 1
 
 
-break _start
-break main
-
-
-#tui enable
-#focus cmd
-
-
+break main_blinky
 continue
-#frame
 
 
 #monitor shutdown

@@ -6,7 +6,7 @@ ELF="$1"
 
 
 OPENOCD_LAUNCH="$OPENOCD -f $OPENOCD_CFG_HW"
-GDB_LAUNCH="$GDB -x $GDB_SCRIPT --silent $ELF"
+GDB_LAUNCH="$GDB -x $GDB_SCRIPT_HW --silent $ELF"
 
 
 #Launch: Hardware + OpenOCD + GDB
