@@ -1,112 +1,66 @@
-# Emulating generic RISC-V 32bit machine on spike
+# FreeRTOS_demo
 
-## Requirements
+This project demonstrates using FreeRTOS on RISC-V embedded system.  
+There are two tasks (threads) - send and receive. Send task sends integers to receive task through a queue. Both tasks output their sending/receiving to memory log and Spike terminal (using `htif`). Tasks outputting is protected with mutex.
 
-1. GNU RISC-V toolchains (tested on Crosstool-NG)
-2. spike from https://github.com/riscv/riscv-isa-sim
-3. OpenOCD from https://github.com/riscv/riscv-openocd
+## Quick start
 
-## How to build toolchain
+Set actual paths in file `paths`.
 
-Clone the Crosstool-NG and configure Crosstool-NG.
+Build project:
 
-```
-$ git clone https://github.com/crosstool-ng/crosstool-ng
-$ cd crosstool-ng
-$ ./bootstrap
-$ ./configure --enable-local
-$ make
-```
+    $ make XLEN=64 DEBUG=1
 
-Generate toolchain configuration:
-- For RV32 builds:
+Launch with hardware:
 
-  Create a file name as "defconfig" ( should be exactly the same, no file extension ) with the below content:
-  ```
-  CT_EXPERIMENTAL=y
-  CT_ARCH_RISCV=y
-  CT_ARCH_64=n
-  CT_ARCH_ARCH="rv32ima"
-  CT_ARCH_ABI="ilp32"
-  CT_TARGET_CFLAGS="-mcmodel=medany"
-  CT_TARGET_LDFLAGS="-mcmodel=medany"
-  CT_MULTILIB=y
-  CT_DEBUG_GDB=y
-  ```
+    $ ./launch-sh/openocd_gdb_launch.sh ./build/RTOSDemo64.elf
+        <stopped at main_blinky()>
+    (gdb) continue
+    (gdb) Ctrl+C
+    (gdb) dump memory /tmp/log (&_LOG_START_ADDRESS) (&_LOG_START_ADDRESS + 1000)
 
-- For RV64 builds:
-  Create a file name as "defconfig" ( should be exactly the same, no file extension ) with the below content:
-  ```
-  CT_EXPERIMENTAL=y
-  CT_ARCH_RISCV=y
-  CT_ARCH_64=y
-  CT_ARCH_ARCH="rv64ima"
-  CT_ARCH_ABI="lp64"
-  CT_TARGET_CFLAGS="-mcmodel=medany"
-  CT_TARGET_LDFLAGS="-mcmodel=medany"
-  CT_MULTILIB=y
-  CT_DEBUG_GDB=y
-  ```
+Launch with Spike:
 
-Run the below command. The configurations will be save to .config file.:
-  ```
-  ./ct-ng defconfig
-  ```
+    $ ./launch-sh/spike_openocd_gdb_launch.sh ./build/RTOSDemo64.elf
+        <stopped at main_blinky()>
+    (gdb) continue
+    (gdb) Ctrl+C
+    (gdb) dump memory /tmp/log (&_LOG_START_ADDRESS) (&_LOG_START_ADDRESS + 1000)
 
-Build the GNU toolchain for RISC-V.
+## Results
 
-```
-$ ./ct-ng build
-```
+At hardware launch and Spike launch results are output to memory log.  
+And at Spike launch results are also output to Spike terminal.
 
-A toolchain is installed at ~/x-tools/riscv32-unknown-elf or  ~/x-tools/riscv64-unknown-elf directory depends on your build.
+Output format:
 
+    <mcycle_value>: Tx: send <counter>
+    <mcycle_value>: Rx: received <counter>
 
-## How to build
+See memory log:
 
-Add path of toolchain that is described above section.
+    $ cat /tmp/log
 
-```
-$ export PATH=~/x-tools/{YOUR_TOOLCHAIN}/bin:$PATH
-```
+        Hello, FreeRTOS!
 
-To build, simply run `make`. If you want a debug build, pass `DEBUG=1`. If
-you want an RV64 build, pass `XLEN=64`.
+        575040508: Tx: send 1
+        575048515: Rx: received 1
+        577540048: Tx: send 2
+        577544282: Rx: received 2
+        580040028: Tx: send 3
+        580043779: Rx: received 3
+        582540028: Tx: send 4
+        582543373: Rx: received 4
+        ...
 
-The resulting executable file is ./build/RTOSDemo32.axf or ./build/RTOSDemo64.axf.
+Send period is 0.1 second (frequency is 25 MHz).
 
-## How to run
+## In Visual Studio Code
 
-RV32:
-```
-$ spike -p1 --isa RV32IMA -m0x80000000:0x10000000 --rbb-port 9824 \
-        ./build/RTOSDemo32.axf
-```
+Set actual paths in files `paths`, `c_cpp_properties.json`, `launch.json`, `tasks.json`.
 
-RV64:
-```
-$ spike -p1 --isa RV64IMA -m0x80000000:0x10000000 --rbb-port 9824 \
-        ./build/RTOSDemo64.axf
-```
+Build project: `Ctrl+Shift+B`.
 
-## How to debug with gdb
+Launch: `F5`.
 
-Start OpenOCD in one terminal:
-```
-$ openocd -f spike-1.cfg
-```
-
-Start gdb in another:
-```
-$ riscv64-unknown-elf-gdb ./build/RTOSDemo.axf
-...
-(gdb) target extended-remote localhost:3333
-...
-(gdb) info threads
-```
-
-(As of 3/22/2021 OpenOCD's RISC-V FreeRTOS awareness is still incomplete.)
-
-## Description
-
-This demo starts separate transmit and receive threads. The transmit thread sends integers through a queue. Both threads print out what they're sending/receiving using HTIF.
+----

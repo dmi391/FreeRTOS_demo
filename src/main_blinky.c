@@ -24,6 +24,12 @@
  *
  */
 
+/*
+ * This demo based on:
+ *  `.../FreeRTOS-main/FreeRTOS/Demo/RISC-V-spike-htif_GCC/`
+ *  `https://github.com/FreeRTOS/FreeRTOS/tree/main/FreeRTOS/Demo/RISC-V-spike-htif_GCC`
+ */
+
 /* FreeRTOS kernel includes. */
 #include <FreeRTOS.h>
 #include <task.h>
